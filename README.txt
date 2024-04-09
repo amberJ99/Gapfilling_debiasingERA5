@@ -1,15 +1,22 @@
 -------------
-GF_evaluation
+Gapfilling_debiasingERA5
 -----------------------------------------------------
 Note to myself: use virtual environment 'GF_evaluation_3'
 -----------------------------------------------------
+
+Important remark: functions only work properly for hourly temperature time series!!!
 
 The different python files consist functions to:
 	- perform GF, with separate techniques or with the algorithm
 	- evaluate the GF with help of a complete dataset
 	- visualize the results
 
-This folder consists of following python files:
+The main folder also needs to consists of following folders:
+	- Data: in this folder you need to place the datasets
+	- Figures: in this folder the figures will be saved as png-file
+	- Results: in this folder a csv-file will be written with the results of the evaluation procedures
+
+The main folder consists of following python files:
 - Execution_read_NoviSad
 	To read in and process the NoviSad data
 - Execution_read_Turku
