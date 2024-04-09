@@ -10,7 +10,7 @@ import matplotlib.ticker as mtick
 import itertools
 
 
-def Put_stations_together(obs_type):
+def Put_stations_together(main_path):
     """
     Puts the quality controlled temperature data of all MOCCA stations together in one dataframe.
 
@@ -20,27 +20,23 @@ def Put_stations_together(obs_type):
 
     """
     
-    name_list = {'temp' : 'Temperature', 'humid': 'Humidity', 'speed': 'Windspeed'}
-    obs_name = name_list[obs_type]
-    
     df_list=list()
     for station in ['BAS', 'DOC', 'GRM', 'HAP', 'SLP', 'SNZ']:
-        path = r"C:\Users\ambjacob\Documents\Python_projecten\MOCCA_QCandGF\Data_made\MOCCA\\" + station + '_' + obs_type + '_QC.csv'
+        path = main_path + "\data\MOCCA\\" + station + '_temp_QC.csv'
         df = read_csv(path, dtindex=True)
-        df = df.loc[:,[obs_name]].copy()
-        df.rename(columns={obs_name: station}, inplace=True)
+        df = df.loc[:,['Temperature']].copy()
+        df.rename(columns={'Temperature': station}, inplace=True)
         df_list.append(df)
         
     df_allstations= pd.concat(df_list, axis=1)
-    print(df_allstations)
     
     return df_allstations
 
 
-def Plot_position_gaps_withoutAll(dataframe, save=False):
+def Plot_position_gaps(dataframe, save):
     """
-    Makes a plot that visualises the positions of the missing values.
-    Each station is visualised below each other.
+    Makes a plot that visualizes the positions of the missing values.
+    Each station is visualised separately and below each other.
 
     Parameters
     ----------
@@ -48,14 +44,15 @@ def Plot_position_gaps_withoutAll(dataframe, save=False):
         The pandas dataframe with the data of all stations.
         The stations are given in separate columns.
         The index of the dataframe are the datetime stamps.
+    save : string
+        Path to the main folder, to save the figure in folder 'Figures' that is located in the main folder.
 
     Returns
     -------
     None.
 
     """
-    
-    
+
     # DETERMINE X LABELS
     # Extract years from DatetimeIndex and exclude the first year
     years = dataframe.index.year.unique()[1:]
@@ -72,18 +69,14 @@ def Plot_position_gaps_withoutAll(dataframe, save=False):
 
     
     # CREATE FIGURE
-    # Make subplots
+    # Make figure
     fig, ax = plt.subplots(1,1, figsize=(10, 4))
-    # plt.title('Location of missing values', fontsize=15)
-    
-    
-    # PLOT 1
     sns.heatmap(dataframe.isnull().transpose(), cmap=cmap, cbar=False)
     
     # Set labels
-    # plt.ylabel('Station', fontsize=text_size)
     plt.yticks(fontsize=ticks_size)
-    # plt.title('Location of missing values', fontsize=text_size-2)
+    plt.xlabel('Year', fontsize=text_size)
+    plt.xticks(fontsize=text_size)
 
     # Set ticks at y_positions
     plt.gca().set_xticks(y_positions)
@@ -99,16 +92,10 @@ def Plot_position_gaps_withoutAll(dataframe, save=False):
     plt.gca().patch.set(lw=2, ec='k')
     ax.hlines(np.arange(1,6), *ax.get_xlim(), color='black', linewidth=0.5)
     
-    # GENERAL
-    # plt.suptitle('Missing values MOCCA')
-    plt.xlabel('Year', fontsize=text_size)
-    plt.xticks(fontsize=text_size)
-    # ax.set_yticks(ticks=ax.get_yticks, which='minor')
-    # plt.yticks(fontsize=text_size)
     
+    # SAVE FIGURE
     if save:
-        path_main = r"C:\Users\ambjacob\Documents\Python_projecten\GF_evaluation"
-        path_figures = os.path.join(path_main, "Figuren")
+        path_figures = os.path.join(save, "Figures")
         plt.savefig(os.path.join(path_figures, 'Gaps_MOCCA_location.png'), format='png', dpi=1200)
     
     plt.show()
