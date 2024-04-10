@@ -69,7 +69,7 @@ thr_minLP = 30
 thr_minLPs = 5
 thr_bs = 15
 
-repetitions = 2
+repetitions = 100
 
 # Dictionary with settings of GF algorithm
 dictionary = {"seasonal_variation":         sv,

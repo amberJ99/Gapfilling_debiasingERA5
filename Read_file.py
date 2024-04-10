@@ -1,3 +1,8 @@
+"""
+
+This file contains a function to read in csv-file to pandas dataframe.
+
+"""
 
 import pandas as pd
 import os

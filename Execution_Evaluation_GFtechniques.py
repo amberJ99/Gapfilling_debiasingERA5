@@ -56,7 +56,7 @@ gl_min = 1 # minimum gap length (for adiministration purpose only)
 gl_step = 0 # not with a regular step (for adiministration purpose only)
 gl_max = 336 # maximum gap length (for adiministration purpose only)
 gaplengths = (1, 3, 5, 7, 10, 20, 30, 336)
-repetitions_value = 10
+repetitions_value = 1000
 check_value=250
 
 
