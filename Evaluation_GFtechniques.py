@@ -355,7 +355,7 @@ def Test_techniques_differentgaplengths(df, name_fulldata, name_model, dictionar
     df_errors : pandas dataframe
         Dataframe with gaplengths as index and GF-techniques as columns, with the mean error for each combination.
     df_sterr : pandas dataframe
-        Dataframe with gaplengths as index and GF-techniques as columns, with the standard deviation for each combination.
+        Dataframe with gaplengths as index and GF-techniques as columns, with the standard error for each combination.
 
     """
 

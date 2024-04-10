@@ -17,18 +17,20 @@ import os
 #%% DEFINE PATHS
 
 main_path = r"C:\Users\ambjacob\Documents\Python_projecten\Gapfilling_debiasingERA5"
-path_data = os.path.join(main_path, "Data", "TURCLIM")
+path_data_Turku = os.path.join(main_path, "Data", "TURCLIM")
+path_data_MOCCA = os.path.join(main_path, "Data", "MOCCA")
 path_results = os.path.join(main_path, "Results")
 path_figures = os.path.join(main_path, "Figures")
 
 
 #%% READ IN TURKU DATA
 
-Turku_obs = read_csv(os.path.join(path_data, "Turku_1H_LI.csv"))
-Turku_ERA5 = read_csv(os.path.join(path_data, "Turku_ERA5.csv"))
+Turku_obs = read_csv(os.path.join(path_data_Turku, "Turku_1H_LI.csv"))
+Turku_ERA5 = read_csv(os.path.join(path_data_Turku, "Turku_ERA5.csv"))
 Turku_ERA5.rename(columns = {old_name: old_name + '_ERA5' for old_name in Turku_ERA5.columns}, inplace=True)
 Turku = pd.concat([Turku_obs, Turku_ERA5], axis=1).iloc[2:-2]   # First/last two timestamps are only available for observations/ERA5
 
+print(Turku)
 city='Turku'
 
 #%% DETERMINE P AND HISTOGRAM (MOCCA)
@@ -36,7 +38,7 @@ city='Turku'
 # Read in MOCCA data
 df_list= list()
 for station in ['BAS', 'DOC', 'GRM', 'HAP', 'SLP', 'SNZ']:
-    df = read_csv(os.path.join(path_data, station + '_temp_QC.csv'), dtindex=True)
+    df = read_csv(os.path.join(path_data_MOCCA, station + '_temp_QC.csv'), dtindex=True)
     df = df.loc[:,['Temperature']].copy()
     df.rename(columns={'Temperature': station}, inplace=True)
     df_list.append(df)
@@ -67,7 +69,7 @@ thr_minLP = 30
 thr_minLPs = 5
 thr_bs = 15
 
-repetitions = 100
+repetitions = 2
 
 # Dictionary with settings of GF algorithm
 dictionary = {"seasonal_variation":         sv,
@@ -81,13 +83,13 @@ dictionary = {"seasonal_variation":         sv,
 
 #%% PERFORM EVALUATION
 
-UHI_obs_calculations, UHI_filled_calculations = Test_multiple_series_of_gaps(Turku, ['Betel'], 'Ylijoki', P_begingap, histogram, dictionary, repetitions)
+UHI_obs_calculations, UHI_filled_calculations = Test_multiple_series_of_gaps(Turku, ['Betel', 'Puutori', 'Virastotalo'], 'Ylijoki', P_begingap, histogram, dictionary, repetitions)
 
 
 #%% SAVE RESULT
 
 idx = pd.IndexSlice
-for station in ['Betel']:
+for station in ['Betel', 'Puutori', 'Virastotalo']:
     # Save the original UHI
     UHI_obs_mean = UHI_obs_calculations.loc[idx[:,station], idx[:,'mean']].reset_index(level=1, drop=True).T.reset_index(level=1, drop=True)
     UHI_obs_sterr = UHI_obs_calculations.loc[idx[:,station], idx[:,'std']].reset_index(level=1, drop=True).T.reset_index(level=1, drop=True)

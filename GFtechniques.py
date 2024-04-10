@@ -1,8 +1,9 @@
 """
 
-This file contains functions to perform the gap-filling fo a single gap. Besides some help-functions, each gap-filling technique has its own function.
+This file contains functions to perform the gap-filling of a single gap. Besides some help-functions, each gap-filling technique has its own function.
 
 !!!!! GF TECHNIQUES ONLY WORK PROPERLY IF THE ONLY NAN VALUES ARE THE MISSING VALUES OF A SINGLE GAP WHICH IS FILLED !!!!!
+!!!!! GF TECHNIQUES ASSUME HOURLY DATA !!!!!
 
 """
 

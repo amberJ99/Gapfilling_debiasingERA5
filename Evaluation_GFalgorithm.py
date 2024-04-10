@@ -1,48 +1,15 @@
-# -*- coding: utf-8 -*-
 """
-Created on Fri Jan 26 14:02:56 2024
 
-@author: ambjacob
+This file contains the functions to perform the evaluation of the gap-filling algorithm.
+
 """
 
 import pandas as pd
 import numpy as np
 import random as r
 import seaborn as sns
-from GF_algorithm import *
+from GFalgorithm import *
 
-def Make_gaps(df, df_referencegaps, station_referencegaps):
-    """
-    Creates gaps in pandas dataframe based on the occurence of gaps in another data series.
-    Only the time period which is present in both the original dataframe and the reference dataframe is selected.
-
-    Parameters
-    ----------
-    df : pandas dataframe
-        Data with datetime index and one or multiple columns in which gaps will be created.
-    df_referencegaps : pandas dataframe
-        Data with at least one column with the presence of gaps.
-    station_referencegaps : string
-        Name of the column of the reference dataframe with the gaps.
-
-    Returns
-    -------
-    df_gaps : pandas dataframe
-        Original dataframe, but with gaps created in each column. 
-
-    """
-
-    # Create dataframe for gapped data, but only with overlapping datetimes
-    df_gaps = df.copy()
-    df_gaps = df_gaps.loc[df_gaps.index.isin(df_referencegaps.index)]
-
-    # Determine rows with nan in reference dataframe
-    mask = df_referencegaps.loc[df_gaps.index, station_referencegaps].isnull()
-
-    # Change the values to nan
-    df_gaps.loc[mask,:]=np.nan
-
-    return df_gaps
 
 def Calculate_gaps_distribution(df_referencegaps, stations_referencegaps):
     """
@@ -78,37 +45,22 @@ def Calculate_gaps_distribution(df_referencegaps, stations_referencegaps):
     gap_lengths = gap_lengths.melt(var_name='Station', value_name='GapLength').dropna() # Put all stations together
     gap_lengths = gap_lengths.loc[gap_lengths['GapLength']!=0]                          # Remove 0's (from sets of not missing values)
     gap_lengths = gap_lengths.sort_values(by=['GapLength'])                             # Sort the dataframe
-    gap_lengths = gap_lengths.iloc[:-1,:]                                               # Remove very long gap of SLP
-    # Eventueel zeer lang gat SLP (einde van metingen) verwijderen, maar dan moet dit aantal DT ook verwijderd worden !!!
-    # print(gap_lengths)
+    gap_lengths = gap_lengths.iloc[:-1,:]                                               # Remove very long gap of SLP (end of measuring period)
     
     # Determine chance of datetime being the beginning of a gap
     number_of_gaps = gap_lengths.shape[0]
-    # print(number_of_gaps)
     number_of_DT = df_ref.melt(var_name='Station', value_name='GapLength').shape[0] - 12631
-    # print(number_of_DT)
     P_begingap = number_of_gaps/number_of_DT
-    # print(P_begingap)
     
     # Determine distribution of gaplengths
-    
-    # With bin edges on .5
-    # bin_size = 1
-    # binvalues = np.arange(-0.5, gap_lengths['GapLength'].max()+1.5, bin_size)
-    # histvalues, bin_edges = np.histogram(gap_lengths['GapLength'], bins=binvalues)
-    
     # With bin edges as integers (left edge of bin is inclusive, right edge is exclusive except for the last bin)
     bin_size = 1
     binvalues = np.arange(1, gap_lengths['GapLength'].max()+1.5, bin_size)
     histvalues, bin_edges = np.histogram(gap_lengths['GapLength'], bins=binvalues, density=True)
     
-    # No control over edges of bins, only the number
-    # histvalues, bin_edges = np.histogram(gap_lengths['GapLength'], bins=int(gap_lengths['GapLength'].max()))
-    
-    # print(histvalues)
-    # print(bin_edges)
-    
     return P_begingap, [histvalues, bin_edges]
+
+
     
 def Make_gaps_based_on_distribution(df, P_begingap, histogram, savespace):
     """
@@ -124,9 +76,10 @@ def Make_gaps_based_on_distribution(df, P_begingap, histogram, savespace):
     histogram : list of two elements
         Information about the probability distribution of the gaplengths.
         The first element gives the probability for each bin.
-        The second element gives the edges of the bins. Bins include the left edge.
+        The second element gives the edges of the bins. Bins include the left edge. 
+        Suggestion: when working with hourly data, make the binwidth one hour, since the left edge will be taken as gaplength when this bin is chosen.
     savespace : integer
-        In order for the algorithm to always work, the situation must be avoided in which the first gap is placed at the very beginning of the dataset.
+        In order for the GF algorithm to always work, the situation must be avoided in which the first gap is placed at the very beginning of the dataset.
         savespace is the number of observations which will be skipped in the beginning of the dataset when making gaps.
 
     Returns
@@ -141,9 +94,8 @@ def Make_gaps_based_on_distribution(df, P_begingap, histogram, savespace):
     df_gaps = df.copy()
     
     i=0
-    # print(df_gaps.index.size)
     while i < df_gaps.index.size:
-        # Determine if it located in savespace:
+        # Determine if it is located in savespace:
         if i < savespace:
             i+=1
             
@@ -152,26 +104,19 @@ def Make_gaps_based_on_distribution(df, P_begingap, histogram, savespace):
            is_gap = (r.random()<= P_begingap)
            
            if is_gap:
-               # print('Gap for index:')
-               # print(i)
                # Determine gaplength
                what_length = np.random.choice(len(histogram[1]) - 1, p=histogram[0])
                gaplength = int(histogram[1][what_length])
-               # print('With gaplength:')
-               # print(gaplength)
                # Make gap
                df_gaps.iloc[i:i+gaplength,:] = np.nan
            
            # Go to next timestamp
            if is_gap:
                i= i+ gaplength + 1     # +1 because two gaps cannot lie side by side
-               # print('Next i:')
-               # print(i)
            else:
                i+=1
             
     return df_gaps
-        
 
 
 
@@ -208,7 +153,7 @@ def sliceSeasons(df):
 
 def Calculate_UHI_onekind(df, nameurban, namerural, plotbool):
     """
-    Calculates for each seasons separately the UHI values for the urban stations. 
+    Calculates for each season separately the UHI values for the urban stations. 
     Also the number of values used for each UHI-value is determined.
 
     Parameters
@@ -260,11 +205,13 @@ def Calculate_UHI_onekind(df, nameurban, namerural, plotbool):
     return UHI_seasons, count_seasons
 
 
+
 def Test_one_series_of_gaps(df, columns_urban, column_rural, P_begingap, histogram, settings, plot=True):
     """
     Calculates the UHI of a dataframe before and after the gap-filling of a series of gaps.
     The series of gaps is made based on a chance and a distribution of gaplengths.
     The UHI is calculated based on the original observations/ filled values at the location of the gaps.
+    !!! The UHI before gap-filling is only based on the timesteps of the gaps --> This is different than the method explained in paper !!!
 
     Parameters
     ----------
@@ -280,6 +227,7 @@ def Test_one_series_of_gaps(df, columns_urban, column_rural, P_begingap, histogr
         Information about the probability distribution of the gaplengths.
         The first element gives the probability for each bin.
         The second element gives the edges of the bins. Bins include the left edge.
+        Suggestion: when working with hourly data, make the binwidth one hour, since the left edge will be taken as gaplength when this bin is chosen.
     settings : dictionary
         Values for the parameters of the gap-filling algorithm.
     plot : boolean, optional
@@ -327,10 +275,7 @@ def Test_one_series_of_gaps(df, columns_urban, column_rural, P_begingap, histogr
     columns_urban_filled = [station + '_FILLED' for station in columns_urban]
     column_rural_filled = column_rural + '_FILLED'
     UHI_filled, count_filled = Calculate_UHI_onekind(df_filled_onlygaps, columns_urban_filled, column_rural_filled, False)
-    
-    print('Count of datapoints for UHI:')
-    print(count_filled)
-    
+     
     
     # MAKE PLOT OF RESULTS
     if plot == True:
@@ -364,10 +309,8 @@ def Test_one_series_of_gaps(df, columns_urban, column_rural, P_begingap, histogr
                 dfm = df.melt('Hour', var_name='Season', value_name='UHI')
                 if count==0:
                     sns.lineplot(ax=ax1, data=dfm, x= 'Hour', y='UHI', hue='Season', linestyle='solid').set(title='UHI '+station)
-                    # plt.legend()
                 else:
                     sns.lineplot(ax=ax1, data=dfm, x='Hour', y='UHI', hue='Season', linestyle='dashed').set(title='UHI '+station)
-                    # plt.legend()
 
             # Plot the number of missing values
             ax2.plot(df_count, marker='o')
@@ -376,12 +319,10 @@ def Test_one_series_of_gaps(df, columns_urban, column_rural, P_begingap, histogr
             # Settings for plot
             ax2.set_xlabel('Hour')
             ax1.set_ylabel('UHI (°C)')
-
             pos1 = ax1.get_position()
             ax1.set_position([pos1.x0, pos1.y0, pos1.width * 0.75, pos1.height])
             pos2 = ax2.get_position()
             ax2.set_position([pos2.x0, pos2.y0, pos2.width * 0.75, pos2.height])
-
             handles, labels = ax1.get_legend_handles_labels()
             for i in range(4,8):
                 handles[i].set_linestyle('--')
@@ -400,7 +341,7 @@ def Test_multiple_series_of_gaps(df, columns_urban, column_rural, P_begingap, hi
     The construction of the series of gaps and calculation of UHI is repeated multiple times. In the end the mean UHI is calculated.
     The series of gaps is made based on a chance and a distribution of gaplengths.
     The UHI is calculated based on the original observations/ filled values at the location of the gaps.
-    
+    !!! The UHI before gap-filling is only based on the timesteps of the gaps --> This is different than the method explained in paper !!!
 
     Parameters
     ----------
@@ -416,6 +357,7 @@ def Test_multiple_series_of_gaps(df, columns_urban, column_rural, P_begingap, hi
         Information about the probability distribution of the gaplengths.
         The first element gives the probability for each bin.
         The second element gives the edges of the bins. Bins include the left edge.
+        Suggestion: when working with hourly data, make the binwidth one hour, since the left edge will be taken as gaplength when this bin is chosen.
     settings : dictionary
         Values for the parameters of the gap-filling algorithm.
     repetitions : integer
@@ -426,29 +368,26 @@ def Test_multiple_series_of_gaps(df, columns_urban, column_rural, P_begingap, hi
 
     Returns
     -------
-    UHI_obs : list of dataframes
-        UHI values for the observations.
-        List of 4 pandas dataframes, one for each season in the order ['winter', 'spring', 'summer', 'autumn'].
-        The dataframe has as index the hours (0-23) and the urban stations as columns, and contains the UHI-values.
-    UHI_filled : list of dataframes
-        UHI values for the filled values.
-        List of 4 pandas dataframes, one for each season in the order ['winter', 'spring', 'summer', 'autumn'].
-        The dataframe has as index the hours (0-23) and the urban stations as columns, and contains the UHI-values.
+    UHI_obs : pandas dataframes
+        Mean UHI values with standard error for the observations.
+        The dataframe has a multi-index both for index and columns.
+        Index: 4 seasons and urban stations.
+        Columns: hours (0-23) and (mean, std). std stands for the standard error and not the standard deviation!
+    UHI_filled : pandas dataframe
+        The dataframe has a multi-index both for index and columns.
+        Index: 4 seasons and urban stations.
+        Columns: hours (0-23) and (mean, std). std stands for the standard error and not the standard deviation!
 
     """
     
     idx = pd.IndexSlice
     
     # Create dataset to store results
-    
     index_season = ['winter', 'spring', 'summer', 'autumn']
     index_stations = columns_urban
     index_repetitions = np.arange(repetitions)
-    
     indices = [index_season, index_stations, index_repetitions]
-    
     multiindex = pd.MultiIndex.from_product(indices, names=["season", "station", "repetition"])
-    
     UHI_obs_all = pd.DataFrame(index=np.arange(24), columns = multiindex)
     UHI_filled_all = pd.DataFrame(index=np.arange(24), columns = multiindex)
     
@@ -457,14 +396,11 @@ def Test_multiple_series_of_gaps(df, columns_urban, column_rural, P_begingap, hi
     for i in np.arange(repetitions):
         print('Start of repetition number '+ str(i))
         UHI_obs, UHI_filled = Test_one_series_of_gaps(df, columns_urban, column_rural, P_begingap, histogram, settings, plot=False)
-        # print(UHI_obs)
         for number, season in enumerate(index_season):
             for station in columns_urban:
                 UHI_obs_all.loc[:, idx[season, station, i]]=UHI_obs[number].loc[:,station]
                 UHI_filled_all.loc[:, idx[season, station, i]]=UHI_filled[number].loc[:,station+'_FILLED']
     
-    # print(UHI_obs_all)
-    # print(UHI_filled_all)
     
     # Calculate mean and standard error
     UHI_obs_calculations = UHI_obs_all.T.groupby(level=[0,1]).agg(['mean', 'std'])
@@ -472,9 +408,7 @@ def Test_multiple_series_of_gaps(df, columns_urban, column_rural, P_begingap, hi
     
     UHI_filled_calculations = UHI_filled_all.T.groupby(level=[0,1]).agg(['mean', 'std'])
     UHI_filled_calculations.loc[:,idx[:,'std']]=UHI_filled_calculations.loc[:,idx[:,'std']] / np.sqrt(repetitions)
-    
-    # print(UHI_obs_calculations)
-    # print(UHI_filled_calculations)
+
     
     return UHI_obs_calculations, UHI_filled_calculations
     

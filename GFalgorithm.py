@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 """
-Created on Thu Jan 25 09:24:20 2024
 
-@author: ambjacob
+This file contains functions to perform the gap-filling algorithm on a dataset with a series of gaps
+
 """
 
 import pandas as pd
@@ -14,7 +13,7 @@ import matplotlib.pyplot as plt
 def GF_debmodelMeanbias_algorithm(df, name_gapped, name_model, LP, time_variation = 0, positioning = 'both', plot = False):
     """
     Performs gap-filling bij debiasing model data by calculating a mean bias (which depends on the hour of the day) for the model data of a certain learning period.
-    The learning period is given as one of the arguments, and not determined by this function.
+    The learning period is given as one of the arguments, and is not determined by this function.
     
     Parameters
     ----------
@@ -28,7 +27,7 @@ def GF_debmodelMeanbias_algorithm(df, name_gapped, name_model, LP, time_variatio
     LP: list of dates
         List with two elements. The first/second element is the datetime of the beginning/end of the gap.
     time_variation : integer, optional
-        variation in hour when calculating the mean bias for a certain hour X. In practice this is done by recalculating the mean bias in a rolling window.
+        Variation in hour when calculating the mean bias for a certain hour X. In practice this is done by recalculating the mean bias in a rolling window.
         Example:
         For the mean bias of hour X, the values which belong to a datetime with hour within the time window [X-time_variation, X+time_variation] will contribute.
         If time_variation > 11, there won't be a distinction between the different hours of the gap and each hour has the same mean bias.
@@ -155,13 +154,13 @@ def GF_algorithm(df, name_gapped, name_model, settings, print_infogaps=True):
     2. Larger gaps are filled by performing the debiasing method by calculating a mean bias.
         - A distiction is made between semi-large gaps, for which the 'both' positioning is selected,
           and large gaps, for which the 'separate' positioning is selected.
-        - The learning period of the debiasing method consists of available timestamps before and after the gap till the previous/next gap.
+        - The learning period (LP) of the debiasing method consists of available timestamps before and after the gap till the previous/next gap.
           If possible the learning period is placed symmetrically, but if not possible a shift or shrinkage of the learning period is possible.
           Positioning of LP:
               1. Try to place LP symmetrical around gap
               2. If this is not possible: shift the learning period to the right/left without adjusting size of LP
               3. If this is not possible: shrink the LP (but never below treshold of minimum length of LP)
-              4. If this is not possible: alow to use previous filled gaps by debiasing method. Still try to place the LP as symmetrical as possible around gap.
+              4. If this is not possible: allow to use previous filled gaps by debiasing method. Still try to place the LP as symmetrical as possible around gap.
         
     Parameters
     ----------
@@ -179,8 +178,6 @@ def GF_algorithm(df, name_gapped, name_model, settings, print_infogaps=True):
                "time_variation": time variation for the debiasing method
                "threshold_minLP": minimum amount of days needed for the learning period for the debiasing method
                "threshold_minLPoneside": minimum amount of days needed on one side of the gap to perform the debiasig method with separate positioning
-               
-                          
     print_infogaps : boolean, optional
         If this is true, a list of the gaps with startdate and length is printed. The default is True.
 
@@ -284,14 +281,6 @@ def GF_algorithm(df, name_gapped, name_model, settings, print_infogaps=True):
             print("WARNING: For gap with DateTime " + str(infogaps_MB.loc[i, 'DateTime']) + ": LP is only " + str(diff_previous + diff_next) + " long.")
             beginLP = begingap - diff_previous
             endLP = endgap + diff_next
-# =============================================================================
-#         elif diff_previous+diff_next<dt.timedelta(days=threshold_minLP) and i!=0:
-#             # prbolem is not fixabel by applying a shift and/or schrinkage
-#             print("WARNING: For gap with DateTime " + str(infogaps_MB.loc[i, 'DateTime']) + ": earlier filled data will be used.")
-#             UsePreviousValues = True
-#             beginLP= begingap - (dt.timedelta(days=seasonal_variation) - diff_next)
-#             endLP= endgap + diff_next
-# =============================================================================
         elif diff_previous+diff_next<dt.timedelta(days=threshold_minLP) and begingap-obs.index[0]+diff_next>=dt.timedelta(days=threshold_minLP):
             # prbolem is not fixabel by applying a shift and/or schrinkage
             print("WARNING: For gap with DateTime " + str(infogaps_MB.loc[i, 'DateTime']) + ": earlier filled data will be used.")

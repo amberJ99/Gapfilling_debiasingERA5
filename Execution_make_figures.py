@@ -207,16 +207,30 @@ plt.savefig(os.path.join(path_figures, 'Evaluation_parameters_' + str(legend_val
 
 #%% FIGURE 8: RESULTS EVALUATION GF ALGORITHM
 
-# Calculate original UHI
+# Select the data that is visualized
+sv = 60
+tv = 1
+thr_LI = 5
+thr_minLP = 30
+thr_minLPs = 5
+thr_bs = 15
+repetitions = 2
+P_begingap = 0.002074
+distrlabel = 'MOCCA'
+city='Turku'
+
+# Calculate original UHI (using ALL observations, not only the ones corresponding to the location of a gap)
 UHI_obs, count_obs = Calculate_UHI_onekind(Turku.loc[:,['Betel', 'Kurala', 'Puutori', 'Tuorla', 'Virastotalo', 'Ylijoki']], ['Betel', 'Kurala', 'Puutori', 'Tuorla', 'Virastotalo'], 'Ylijoki', False)
 
 # Select the data and put it into one dataframe for every station
 for station in ['Betel', 'Puutori', 'Virastotalo']:
+    # Prepare dataset of original UHI
     UHI_obs_mean = pd.DataFrame(index= UHI_obs[0].index, columns = ['autumn', 'spring', 'summer', 'winter'])
     number_season = [3, 1, 2, 0]  # Sequence of seasons is ['winter', 'spring', 'summer', 'autumn']
     for number, season in enumerate(['autumn', 'spring', 'summer', 'winter']):
         UHI_obs_mean.loc[:, season]=UHI_obs[number_season[number]].loc[:,station]
     
+    # Prepare dataset of estimated UHI
     UHI_filled_mean = pd.read_csv(os.path.join(path_results, "TestGFalgorithm_sv" + str(sv) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel + '_rep' + str(repetitions) + '_' + city + "_" + station + "_FILLED_mean.csv"),
                                 index_col=0)
     # UHI_filled_mean.rename(columns= {'autumn': 'autumn_filled', 'spring': 'spring_filled', 'summer': 'summer_filled', 'winter': 'winter_filled'}, inplace=True)
@@ -226,7 +240,6 @@ for station in ['Betel', 'Puutori', 'Virastotalo']:
     
     # Set up the subplots
     fig, ax = plt.subplots(1)
-
     color_map = ['royalblue', 'darkorange', 'forestgreen', 'red']
     
     # Plot the UHI
@@ -236,22 +249,18 @@ for station in ['Betel', 'Puutori', 'Virastotalo']:
                 ax.errorbar(df.index, df[column], yerr=None, markersize=1, marker='.', label= column, linestyle = 'dashed', color = color_map[count_season])
             else:
                 plotdash = ax.errorbar(df.index, df[column], yerr=UHI_filled_sterr[column].mul(1.96), capsize=3, markersize=1, marker='.', label = column, color = color_map[count_season])
-                # plotdash[-1][0].set_linestyle('dashed')
 
     # Settings for plot
     ax.set_title('UHI '+ station)
     ax.set_xlabel('Hour')
     ax.set_ylabel('UHI (°C)')
 
-    # ax.legend(bbox_to_anchor=(1, 1), title='Original UHI')
-
     # To get legends:
     lines, labels = ax.get_legend_handles_labels()
     # ax.legend([lines[i] for i in [0,1,2,3]], [labels[i] for i in [0,1,2,3]], title='Original UHI')
-    ax.legend([lines[i] for i in [4,5,6,7]], [labels[i] for i in [4,5,6,7]], title='Estimated UHI')
+    # ax.legend([lines[i] for i in [4,5,6,7]], [labels[i] for i in [4,5,6,7]], title='Estimated UHI')
     
-    # plt.show()
-    
+    # Save figure
     fig.savefig(os.path.join(path_figures, 'Evaluation_algorithm_' + station + 'estimatedUHI.png'), format='png', dpi=1200)
 
 

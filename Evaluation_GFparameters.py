@@ -62,8 +62,8 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
         Dataframe with the mean error values.
         When varying one parameter: index are the gaplengths and columns are the different values of the parameter.
         When varying two parameters: index are the values of the first parameter and columns are the values of the second parameter.
-    df_allstd : pandas dataframe
-        Dataframe with the standard deviation values.
+    df_allsterr : pandas dataframe
+        Dataframe with the standard error values.
         When varying one parameter: index are the gaplengths and columns are the different values of the parameter.
         When varying two parameters: index are the values of the first parameter and columns are the values of the second parameter.
 
@@ -85,7 +85,7 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
         # Prepare dataframe to store error
         rangeofvalues = [par for count, par in enumerate(list_parameters) if list_islist[count]][0]
         df_allerrors = pd.DataFrame(index=gaplengths, columns=rangeofvalues)
-        df_allstd = pd.DataFrame(index=gaplengths, columns=rangeofvalues)
+        df_allsterr = pd.DataFrame(index=gaplengths, columns=rangeofvalues)
 
         # For every value of the parameter: perform meanbias technique for different gaplengths and multiple gaps
         for value in rangeofvalues:
@@ -98,7 +98,7 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
                 elif positioning in ('both', 'separate'):
                     cutoff = value / 2
                 # Perform meanbias technique
-                df_result, df_std = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
+                df_result, df_sterr = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
                     "debmodelMeanbias": [value, tv, positioning, False]}, int(np.ceil(cutoff)), error, gaplengths, repetitions,
                                                                         check, plot=False)
             elif list_islist[1]==True:
@@ -108,7 +108,7 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
                 elif positioning in ('both', 'separate'):
                     cutoff = sv / 2
                 # Perform meanbias technique
-                df_result, df_std = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
+                df_result, df_sterr = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
                     "debmodelMeanbias": [sv, value, positioning, False]}, int(np.ceil(cutoff)), error, gaplengths,
                                                                         repetitions, check, plot=False)
             elif list_islist[2]==True:
@@ -118,18 +118,18 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
                 elif value in ('both', 'separate'):
                     cutoff = sv / 2
                 # Perform meanbias technique
-                df_result, df_std = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
+                df_result, df_sterr = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
                     "debmodelMeanbias": [sv, tv, value, False]}, int(np.ceil(cutoff)), error, gaplengths, repetitions,
                                                                         check, plot=False)
 
             # Store the results in dataframe
             df_allerrors.loc[:, value] = df_result['debmodelMeanbias']
-            df_allstd.loc[:, value] = df_std['debmodelMeanbias']
+            df_allsterr.loc[:, value] = df_sterr['debmodelMeanbias']
             
 
         # If asked, plot the error in function of gaplength for every value of the parameter
         if plot == True:
-            df_allerrors.plot(marker='o', yerr=df_allstd, capsize=10)
+            df_allerrors.plot(marker='o', yerr=df_allsterr, capsize=10)
             plt.xlabel('Gaplength (hour)')
             plt.ylabel(error)
             if error == 'MBE':
@@ -140,7 +140,7 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
         # Prepare dataframe to store error
         rangeofvalues = [par for count, par in enumerate(list_parameters) if list_islist[count]]
         df_allerrors = pd.DataFrame(index=rangeofvalues[0], columns=rangeofvalues[1])
-        df_allstd = pd.DataFrame(index=rangeofvalues[0], columns=rangeofvalues[1])
+        df_allsterr = pd.DataFrame(index=rangeofvalues[0], columns=rangeofvalues[1])
         
         # Run over every value of the first parameter
         for value0 in rangeofvalues[0]:
@@ -149,15 +149,15 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
             for value1 in rangeofvalues[1]:
                 print('Running for value of second parameter: ' + str(value1))
                 if (list_islist[0] and list_islist[1]) ==True:
-                    df_result, df_std = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
+                    df_result, df_sterr = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
                         "debmodelMeanbias": [value0, value1, positioning, False]}, int(np.ceil(value0/2)), error, gaplengths, repetitions,
                                                                             check, plot=False)
                 elif (list_islist[0] and list_islist[2]) ==True:
-                    df_result, df_std = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
+                    df_result, df_sterr = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
                         "debmodelMeanbias": [value0, tv, value1, False]}, int(np.ceil(value0/2)), error, gaplengths, repetitions,
                                                                             check, plot=False)
                 elif (list_islist[1] and list_islist[2]) ==True:
-                    df_result, df_std = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
+                    df_result, df_sterr = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
                         "debmodelMeanbias": [sv, value0, value1, False]}, int(np.ceil(sv/2)), error, gaplengths, repetitions,
                                                                             check, plot=False)
 
@@ -187,5 +187,5 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
             plt.show()
 
 
-    return df_allerrors, df_allstd
+    return df_allerrors, df_allsterr
 
