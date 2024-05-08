@@ -25,7 +25,7 @@ def GF_debmodelMeanbias_algorithm(df, name_gapped, name_model, LP, time_variatio
     name_model : string
         Name of the column with the model data.
     LP: list of dates
-        List with two elements. The first/second element is the datetime of the beginning/end of the gap.
+        List with two elements. The first/second element is the datetime of the beginning/end of the learning period.
     time_variation : integer, optional
         Variation in hour when calculating the mean bias for a certain hour X. In practice this is done by recalculating the mean bias in a rolling window.
         Example:
@@ -35,7 +35,7 @@ def GF_debmodelMeanbias_algorithm(df, name_gapped, name_model, LP, time_variatio
     positioning : string
         Positioning of the learning period. Possibilities:
             -'both': the LP is placed symmetrical around the gap
-            -'separate': the LP is divided in two parts, one part before the gap and one part after the gap (each with a size seasonal_variation/2)
+            -'separate': the LP is divided in two parts, one part before the gap and one part after the gap
         The default is 'both'.
     plot : boolean, optional
         If plot==True, a plot is made of the mean bias in function of the hour of the day.
@@ -174,7 +174,7 @@ def GF_algorithm(df, name_gapped, name_model, settings, print_infogaps=True):
         Dictionary with the settings for the gap-filling algorithm. Possiblities:
              - "threshold_LI": for gaps smaller than treshold_LI (in amount of hours), LI will be applied
                "threshold_bs": for gaps with threshold_bs <= length, separate positioning is used
-               "seasonal_variation": seasonal variation for the debiasing method
+               "seasonal_span": seasonal span for the debiasing method
                "time_variation": time variation for the debiasing method
                "threshold_minLP": minimum amount of days needed for the learning period for the debiasing method
                "threshold_minLPoneside": minimum amount of days needed on one side of the gap to perform the debiasig method with separate positioning
@@ -195,7 +195,7 @@ def GF_algorithm(df, name_gapped, name_model, settings, print_infogaps=True):
 
 
     # 1. Set values of some parameters
-    seasonal_variation = settings['seasonal_variation']
+    seasonal_span = settings['seasonal_span']
     time_variation = settings['time_variation']
     threshold_LI = settings['threshold_LI']
     threshold_minLP = settings['threshold_minLP']        
@@ -264,17 +264,17 @@ def GF_algorithm(df, name_gapped, name_model, settings, print_infogaps=True):
 
         # Determine begin and end of learning period
         UsePreviousValues = False
-        if (diff_previous >= dt.timedelta(days=seasonal_variation/2) and diff_next >= dt.timedelta(days=seasonal_variation/2)):
+        if (diff_previous >= dt.timedelta(days=seasonal_span/2) and diff_next >= dt.timedelta(days=seasonal_span/2)):
             # both sides have no problem
-            beginLP = begingap - dt.timedelta(days=seasonal_variation/2)
-            endLP = endgap + dt.timedelta(days=seasonal_variation/2)
-        elif (diff_previous < dt.timedelta(days=seasonal_variation/2) and diff_next >= dt.timedelta(days=seasonal_variation)-diff_previous):
+            beginLP = begingap - dt.timedelta(days=seasonal_span/2)
+            endLP = endgap + dt.timedelta(days=seasonal_span/2)
+        elif (diff_previous < dt.timedelta(days=seasonal_span/2) and diff_next >= dt.timedelta(days=seasonal_span)-diff_previous):
             # left side has problem, but fixable by applying a shift
             beginLP = begingap - diff_previous
-            endLP = endgap + (dt.timedelta(days=seasonal_variation)-diff_previous)
-        elif (diff_previous >= dt.timedelta(days=seasonal_variation)-diff_next and diff_next < dt.timedelta(days=seasonal_variation/2)):
+            endLP = endgap + (dt.timedelta(days=seasonal_span)-diff_previous)
+        elif (diff_previous >= dt.timedelta(days=seasonal_span)-diff_next and diff_next < dt.timedelta(days=seasonal_span/2)):
             # right side has problem, but fixable by applying a shift
-            beginLP = begingap - (dt.timedelta(days=seasonal_variation)- diff_next)
+            beginLP = begingap - (dt.timedelta(days=seasonal_span)- diff_next)
             endLP = endgap + diff_next
         elif diff_previous+diff_next>=dt.timedelta(days=threshold_minLP):
             # problem is not fixable by applying a shift, but can be fixed by applying a shrinkage + shift
@@ -285,7 +285,7 @@ def GF_algorithm(df, name_gapped, name_model, settings, print_infogaps=True):
             # prbolem is not fixabel by applying a shift and/or schrinkage
             print("WARNING: For gap with DateTime " + str(infogaps_MB.loc[i, 'DateTime']) + ": earlier filled data will be used.")
             UsePreviousValues = True
-            beginLP= begingap - min((dt.timedelta(days=seasonal_variation) - diff_next), begingap-obs.index[0])
+            beginLP= begingap - min((dt.timedelta(days=seasonal_span) - diff_next), begingap-obs.index[0])
             endLP= endgap + diff_next
         elif diff_previous+diff_next<dt.timedelta(days=threshold_minLP) and begingap-obs.index[0]+diff_next<dt.timedelta(days=threshold_minLP):
             print("WARNING: First gap in dataset can not be filled (not enough LP)")

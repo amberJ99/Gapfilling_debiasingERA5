@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def determine_LP(begingap, endgap, seasonal_variation, positioning):
+def determine_LP(begingap, endgap, seasonal_span, positioning):
     """
     Determines the datetime values of the learning period (LP).
 
@@ -23,7 +23,7 @@ def determine_LP(begingap, endgap, seasonal_variation, positioning):
         First datetimestamp of the gap.
     endgap : datetime
         Last datetimestamp of the gap.
-    seasonal_variation : integer
+    seasonal_span : integer
         Size of the learning period expressed in number of days. 
         This amount of days will be taken before or after the gap, or a combination of both.
     positioning : string
@@ -31,7 +31,7 @@ def determine_LP(begingap, endgap, seasonal_variation, positioning):
             -'left': the LP is placed before the gap
             -'right': the LP is placed after the gap
             -'both': the LP is placed symmetrical around the gap
-            -'separate': the LP is divided in two parts, one part before the gap and one part after the gap (each with a size seasonal_variation/2)
+            -'separate': the LP is divided in two parts, one part before the gap and one part after the gap (each with a size seasonal_span/2)
 
     Returns
     -------
@@ -44,11 +44,11 @@ def determine_LP(begingap, endgap, seasonal_variation, positioning):
 
     # Determine begin and end learning period
     if positioning in ('left', 'right'):
-        beginLP = begingap - dt.timedelta(days=seasonal_variation)
-        endLP = endgap + dt.timedelta(days=seasonal_variation)
+        beginLP = begingap - dt.timedelta(days=seasonal_span)
+        endLP = endgap + dt.timedelta(days=seasonal_span)
     elif positioning in ('both', 'separate'):
-        beginLP = begingap - dt.timedelta(days=seasonal_variation / 2)
-        endLP = endgap + dt.timedelta(days=seasonal_variation / 2)
+        beginLP = begingap - dt.timedelta(days=seasonal_span / 2)
+        endLP = endgap + dt.timedelta(days=seasonal_span / 2)
     else:
         print('ERROR: positioning must be left, right, both or separate.')
 
@@ -123,7 +123,7 @@ def GF_fillmodel(df, name_gapped, name_model):
     return df
 
 
-def GF_debmodelReg(df, name_gapped, name_model, seasonal_variation = 30, time_variation=0, positioning='both', degree=1, plot=False):
+def GF_debmodelReg(df, name_gapped, name_model, seasonal_span = 30, time_variation=0, positioning='both', degree=1, plot=False):
     """
     Performs gap-filling by debiasing model data by calculating a regression between the observations and model data of a certain learning period.
 
@@ -135,21 +135,21 @@ def GF_debmodelReg(df, name_gapped, name_model, seasonal_variation = 30, time_va
         Name of the column with the gapped data.
     name_model : string
         Name of the column with the model data.
-    seasonal_variation : integer, optional
+    seasonal_span : integer, optional
         Size of the learning period expressed in number of days. This amount of days will be taken before or after the gap, or a combination of both (depending on the positioning). 
         The default is 30.
     time_variation : integer, optional
         Variation in hour when calculating the regression for a certain hour X. 
         Example:
         For the regression of hour X, the values which belong to a datetime with hour within the time window [X-time_variation, X+time_variation] will be selected and used.
-        If time_variation > 11, there won't be a distinction between the different hours of the gap (only one regression is calculated with the values of all the datetimes in the learning period determined by seasonal_variation).
+        If time_variation > 11, there won't be a distinction between the different hours of the gap (only one regression is calculated with the values of all the datetimes in the learning period determined by seasonal_span).
         The default is 0.
     positioning : string
         Positioning of the learning period. Possibilities:
             -'left': the LP is placed before the gap
             -'right': the LP is placed after the gap
             -'both': the LP is placed symmetrical around the gap
-            -'separate': the LP is divided in two parts, one part before the gap and one part after the gap (each with a size seasonal_variation/2)
+            -'separate': the LP is divided in two parts, one part before the gap and one part after the gap (each with a size seasonal_span/2)
         The default is 'both'.
     degree : integer, optional
         Degree of the regression. 
@@ -175,7 +175,7 @@ def GF_debmodelReg(df, name_gapped, name_model, seasonal_variation = 30, time_va
 
 
     # 2. Determine LP
-    LP = determine_LP(begingap, endgap, seasonal_variation, positioning)
+    LP = determine_LP(begingap, endgap, seasonal_span, positioning)
 
 
     # 3. Debias ERA5
@@ -269,7 +269,7 @@ def GF_debmodelReg(df, name_gapped, name_model, seasonal_variation = 30, time_va
     return df
 
 
-def GF_debmodelMeanbias(df, name_gapped, name_model, seasonal_variation = 30, time_variation = 0, positioning = 'both', plot = False):
+def GF_debmodelMeanbias(df, name_gapped, name_model, seasonal_span = 30, time_variation = 0, positioning = 'both', plot = False):
     """
     Performs gap-filling bij debiasing model data by calculating a mean bias (which depends on the hour of the day) for the model data of a certain learning period.
 
@@ -281,7 +281,7 @@ def GF_debmodelMeanbias(df, name_gapped, name_model, seasonal_variation = 30, ti
         Name of the column with the gapped data.
     name_model : string
         Name of the column with the model data.
-    seasonal_variation : integer, optional
+    seasonal_span : integer, optional
         Size of the learning period expressed in number of days. This amount of days will be taken before or after the gap, or a combination of both (depending on the positioning). 
         The default is 30.
     time_variation : integer, optional
@@ -295,7 +295,7 @@ def GF_debmodelMeanbias(df, name_gapped, name_model, seasonal_variation = 30, ti
             -'left': the LP is placed before the gap
             -'right': the LP is placed after the gap
             -'both': the LP is placed symmetrical around the gap
-            -'separate': the LP is divided in two parts, one part before the gap and one part after the gap (each with a size seasonal_variation/2)
+            -'separate': the LP is divided in two parts, one part before the gap and one part after the gap (each with a size seasonal_span/2)
         The default is 'both'.
     plot : boolean, optional
         If plot==True, a plot is made of the mean bias in function of the hour of the day.
@@ -318,7 +318,7 @@ def GF_debmodelMeanbias(df, name_gapped, name_model, seasonal_variation = 30, ti
 
 
     # 2. Determine LP
-    LP = determine_LP(begingap, endgap, seasonal_variation, positioning)
+    LP = determine_LP(begingap, endgap, seasonal_span, positioning)
 
     
     # 3. Debias ERA5
@@ -394,7 +394,7 @@ def GF_debmodelMeanbias(df, name_gapped, name_model, seasonal_variation = 30, ti
 
 
 
-def GF_debmodelTvar(df, name_gapped, name_model, seasonal_variation = 30, time_variation=0, positioning='both'):
+def GF_debmodelTvar(df, name_gapped, name_model, seasonal_span = 30, time_variation=0, positioning='both'):
     """
     Performs gap-filling by debiasing model data by calculating a weighted mean bias (which depends on the hour of the day) for the model data of a certain learning period.
     The weights are determined based on similarities in daily temperature variation between the days in the learning period and the day of the filled missing value.
@@ -407,7 +407,7 @@ def GF_debmodelTvar(df, name_gapped, name_model, seasonal_variation = 30, time_v
         Name of the column with the gapped data.
     name_model : string
         Name of the column with the model data.
-    seasonal_variation : integer, optional
+    seasonal_span : integer, optional
         Size of the learning period expressed in number of days. This amount of days will be taken before or after the gap, or a combination of both (depending on the positioning). 
         The default is 30.
     time_variation : integer, optional
@@ -421,7 +421,7 @@ def GF_debmodelTvar(df, name_gapped, name_model, seasonal_variation = 30, time_v
             -'left': the LP is placed before the gap
             -'right': the LP is placed after the gap
             -'both': the LP is placed symmetrical around the gap
-            -'separate': the LP is divided in two parts, one part before the gap and one part after the gap (each with a size seasonal_variation/2)
+            -'separate': the LP is divided in two parts, one part before the gap and one part after the gap (each with a size seasonal_span/2)
         The default is 'both'.
 
     Returns
@@ -442,7 +442,7 @@ def GF_debmodelTvar(df, name_gapped, name_model, seasonal_variation = 30, time_v
 
     
     # 2. Determine LP
-    LP = determine_LP(begingap, endgap, seasonal_variation, positioning)
+    LP = determine_LP(begingap, endgap, seasonal_span, positioning)
     
 
     # 3. Debias ERA5

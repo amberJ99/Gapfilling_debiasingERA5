@@ -62,7 +62,7 @@ distrlabel = 'Customsmallgaps'
 #%% SETUP GF ALGORITHM
 
 # Parameters
-sv = 60
+s = 60
 tv = 1
 thr_LI = 5
 thr_minLP = 30
@@ -72,7 +72,7 @@ thr_bs = 15
 repetitions = 100
 
 # Dictionary with settings of GF algorithm
-dictionary = {"seasonal_variation":         sv,
+dictionary = {"seasonal_span":              s,
               "time_variation":             tv,
               "threshold_LI":               thr_LI,     # For gaps smaller than treshold_LI (in amount of hours), LI will be applied
               "threshold_minLP":            thr_minLP,  # minimum amount of days needed for LP
@@ -94,15 +94,15 @@ for station in ['Betel', 'Puutori', 'Virastotalo']:
     UHI_obs_mean = UHI_obs_calculations.loc[idx[:,station], idx[:,'mean']].reset_index(level=1, drop=True).T.reset_index(level=1, drop=True)
     UHI_obs_sterr = UHI_obs_calculations.loc[idx[:,station], idx[:,'std']].reset_index(level=1, drop=True).T.reset_index(level=1, drop=True)
     
-    UHI_obs_mean.to_csv(os.path.join(path_results, "TestGFalgorithm_sv" + str(sv) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel + '_rep' + str(repetitions) + '_' + city + "_" + station + "_OBS_mean.csv"), index=True)
-    UHI_obs_sterr.to_csv(os.path.join(path_results, "TestGFalgorithm_sv" + str(sv) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel  + '_rep' + str(repetitions) + '_' +city + "_" + station + "_OBS_sterr.csv"), index=True)
+    UHI_obs_mean.to_csv(os.path.join(path_results, "TestGFalgorithm_s" + str(s) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel + '_rep' + str(repetitions) + '_' + city + "_" + station + "_OBS_mean.csv"), index=True)
+    UHI_obs_sterr.to_csv(os.path.join(path_results, "TestGFalgorithm_s" + str(s) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel  + '_rep' + str(repetitions) + '_' +city + "_" + station + "_OBS_sterr.csv"), index=True)
 
     # Save the estimated UHI
     UHI_filled_mean = UHI_filled_calculations.loc[idx[:,station], idx[:,'mean']].reset_index(level=1, drop=True).T.reset_index(level=1, drop=True)
     UHI_filled_sterr = UHI_filled_calculations.loc[idx[:,station], idx[:,'std']].reset_index(level=1, drop=True).T.reset_index(level=1, drop=True)
     
-    UHI_filled_mean.to_csv(os.path.join(path_results, "TestGFalgorithm_sv" + str(sv) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel + '_rep' + str(repetitions) + '_' + city + "_" + station + "_FILLED_mean.csv"), index=True)
-    UHI_filled_sterr.to_csv(os.path.join(path_results, "TestGFalgorithm_sv" + str(sv) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel + '_rep' + str(repetitions) + '_' +city + "_" + station + "_FILLED_sterr.csv"), index=True)
+    UHI_filled_mean.to_csv(os.path.join(path_results, "TestGFalgorithm_s" + str(s) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel + '_rep' + str(repetitions) + '_' + city + "_" + station + "_FILLED_mean.csv"), index=True)
+    UHI_filled_sterr.to_csv(os.path.join(path_results, "TestGFalgorithm_s" + str(s) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel + '_rep' + str(repetitions) + '_' +city + "_" + station + "_FILLED_sterr.csv"), index=True)
 
 
 

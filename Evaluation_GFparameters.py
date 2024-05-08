@@ -7,7 +7,7 @@ This file contains the functions to perform the evaluation of the selection para
 import pandas as pd
 from Evaluation_GFtechniques import *
 
-def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=0, positioning='both', error = 'MSE', gaplengths=list(range(5,20,1)), weights=False, repetitions=1000, check=250, plot=True):
+def Test_parameters(df, name_fulldata, name_model, s=list(range(15,55,10)), tv=0, positioning='both', error = 'MSE', gaplengths=list(range(5,20,1)), weights=False, repetitions=1000, check=250, plot=True):
     """
     Performs the gap filling technique GF_debmodelMeanbias with different values for a certain parameter. 
     The technique is performed for multiple gaps and for multiple gap lengths.
@@ -23,7 +23,7 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
         Name of the column with the observations. 
     name_model : string
         Name of the column with the model data.
-    sv : integer or list, optional
+    s : integer or list, optional
         If an integer is given, this value is taken for this parameter. 
         If a list is given, the value of this parameter is varied over the values in the list. 
         The default is list(range(15,55,10)).
@@ -71,7 +71,7 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
     
                                     
     # Check which parameter is given as list (and will be varied)
-    list_parameters = [sv, tv, positioning]
+    list_parameters = [s, tv, positioning]
     list_islist = [isinstance(i, list) for i in list_parameters]
     amount_varpar = sum(list_islist)
 
@@ -104,22 +104,22 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
             elif list_islist[1]==True:
                 # Determine the number of days the gap must stay from the ends of the data set
                 if positioning in ('left', 'right'):
-                    cutoff = sv
+                    cutoff = s
                 elif positioning in ('both', 'separate'):
-                    cutoff = sv / 2
+                    cutoff = s / 2
                 # Perform meanbias technique
                 df_result, df_sterr = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
-                    "debmodelMeanbias": [sv, value, positioning, False]}, int(np.ceil(cutoff)), error, gaplengths,
+                    "debmodelMeanbias": [s, value, positioning, False]}, int(np.ceil(cutoff)), error, gaplengths,
                                                                         repetitions, check, plot=False)
             elif list_islist[2]==True:
                 # Determine the number of days the gap must stay from the ends of the data set
                 if value in ('left', 'right'):
-                    cutoff = sv
+                    cutoff = s
                 elif value in ('both', 'separate'):
-                    cutoff = sv / 2
+                    cutoff = s / 2
                 # Perform meanbias technique
                 df_result, df_sterr = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
-                    "debmodelMeanbias": [sv, tv, value, False]}, int(np.ceil(cutoff)), error, gaplengths, repetitions,
+                    "debmodelMeanbias": [s, tv, value, False]}, int(np.ceil(cutoff)), error, gaplengths, repetitions,
                                                                         check, plot=False)
 
             # Store the results in dataframe
@@ -158,7 +158,7 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
                                                                             check, plot=False)
                 elif (list_islist[1] and list_islist[2]) ==True:
                     df_result, df_sterr = Test_techniques_differentgaplengths(df, name_fulldata, name_model, {
-                        "debmodelMeanbias": [sv, value0, value1, False]}, int(np.ceil(sv/2)), error, gaplengths, repetitions,
+                        "debmodelMeanbias": [s, value0, value1, False]}, int(np.ceil(s/2)), error, gaplengths, repetitions,
                                                                             check, plot=False)
 
                 # Take mean over all gaplengths:
@@ -180,7 +180,7 @@ def Test_parameters(df, name_fulldata, name_model, sv=list(range(15,55,10)), tv=
             print(df_copy)
             # Plot errors in heatmap
             ax = sns.heatmap(df_copy, cbar_kws={'label': error}, cmap="Blues")
-            nameofparameters = [par for count, par in enumerate(['sv (days)', 'tv (hour)', 'positioning']) if list_islist[count]]
+            nameofparameters = [par for count, par in enumerate(['s (days)', 'tv (hour)', 'positioning']) if list_islist[count]]
             plt.xlabel(nameofparameters[1])
             plt.ylabel(nameofparameters[0])
             ax.invert_yaxis()

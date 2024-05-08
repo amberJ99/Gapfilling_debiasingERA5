@@ -35,8 +35,8 @@ city='Turku'
 #%% SETUP OF GF
 
 # Dictionary with settings of GF 
-sv_val=60
-# sv_val=[2,5,10,20,30,60,80,150]
+s_val=60
+# s_val=[2,5,10,20,30,60,80,150]
 tv_val=1
 # tv_val = [0, 1, 3, 7, 12]
 # pos = 'both'
@@ -68,7 +68,7 @@ check_value=250
 df_errors, df_sterr = Test_parameters(  df=dataset, 
                                         name_fulldata=station, 
                                         name_model=ERA5,
-                                        sv=sv_val,
+                                        s=s_val,
                                         tv=tv_val,
                                         positioning = pos,
                                         error='MSE',
@@ -80,6 +80,6 @@ df_errors, df_sterr = Test_parameters(  df=dataset,
 
 #%% SAVE RESULTS
 
-df_errors.to_csv(os.path.join(path_results, "TestGFparameters_" + str(pos) + '_sv' + str(sv_val) + 'd_tv' + str(tv_val) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_errors.csv"), index=True)
-df_sterr.to_csv(os.path.join(path_results, "TestGFparameters_" + str(pos) + '_sv' + str(sv_val) + 'd_tv' + str(tv_val) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_sterr.csv"), index=True)
+df_errors.to_csv(os.path.join(path_results, "TestGFparameters_" + str(pos) + '_s' + str(s_val) + 'd_tv' + str(tv_val) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_errors.csv"), index=True)
+df_sterr.to_csv(os.path.join(path_results, "TestGFparameters_" + str(pos) + '_s' + str(s_val) + 'd_tv' + str(tv_val) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_sterr.csv"), index=True)
 

@@ -244,7 +244,7 @@ def Test_techniques_differentgapdates(df, name_fulldata, name_model, gap_length,
         If it is not a list, only the dataframe will be an argument for the function. 
         Example: dictionarytechniques={"linint": np.nan , "fillmodel": np.nan, "debmodelReg":[12, 0, 'separate'], "debmodelMeanbias": [15, 1, 'both', True]}.
     par_slicedates : integer
-        The amount of days which will be sliced from the beginning and end of the dataset, so the gap will be placed far enough from the edges of the dataset according to the seasonal variation. 
+        The amount of days which will be sliced from the beginning and end of the dataset, so the gap will be placed far enough from the edges of the dataset according to the seasonal span. 
     listerrors : list of strings
         A list with the errors that are calculated. Possibilities: 'MBE', 'RMSE', 'MSE', 'MAE'.
     repetitions : integer
@@ -337,7 +337,7 @@ def Test_techniques_differentgaplengths(df, name_fulldata, name_model, dictionar
         If it is not a list, only the dataframe will be an argument for the function. 
         Example: dictionarytechniques={"linint": np.nan , "fillmodel": np.nan, "debmodelReg":[12, 0, 'separate'], "debmodelMeanbias": [15, 1, 'both', True]}.
     par_slicedates : integer
-        The amount of days which will be sliced from the beginning and end of the dataset, so the gap will be placed far enough from the edges of the dataset according to the seasonal variation. 
+        The amount of days which will be sliced from the beginning and end of the dataset, so the gap will be placed far enough from the edges of the dataset according to the seasonal span. 
     error : string
         The error that is calculated. Possibilities: 'MBE', 'RMSE', 'MSE', 'MAE'.
     range_gaplengths : list

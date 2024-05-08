@@ -39,11 +39,11 @@ Plot_both_distributions(df_allstations, main_path)
 #%% FIGURE 6: RESULTS EVALUATION GF TECHNIQUES 
     
 # Select the data that is visualized
-sv=60
+s=60
 tv=1
 positioning = 'both'
 city = 'Turku'
-stations = ['Betel', 'Kurala', 'Puutori', 'Turola', 'Virastotalo', 'Ylijoki']
+stations = ['Betel', 'Kurala', 'Puutori', 'Tuorla', 'Virastotalo', 'Ylijoki']
 station = stations[5]
 error_value = 'MSE'
 gl_min = 1 # minimum gap length
@@ -52,8 +52,8 @@ gl_max = 336 # maximum gap length
 repetitions_value = 10
 
 # Read data
-df_errors = pd.read_csv(os.path.join(path_results, "TestGFtechniques_" + positioning + '_sv' + str(sv) + 'd_tv' + str(tv) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_errors.csv"), index_col=0)
-df_sterr = pd.read_csv(os.path.join(path_results, "TestGFtechniques_" + positioning + '_sv' + str(sv) + 'd_tv' + str(tv) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_sterr.csv"), index_col=0)
+df_errors = pd.read_csv(os.path.join(path_results, "TestGFtechniques_" + positioning + '_s' + str(s) + 'd_tv' + str(tv) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_errors.csv"), index_col=0)
+df_sterr = pd.read_csv(os.path.join(path_results, "TestGFtechniques_" + positioning + '_s' + str(s) + 'd_tv' + str(tv) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_sterr.csv"), index_col=0)
 
 
 # Make figures and axes
@@ -127,7 +127,7 @@ plt.savefig(os.path.join(path_figures, 'Evaluation_techniques_' + station + '.pn
 #%% FIGURE 7: RESULTS EVALUATION SELECTION PARAMETERS
 
 # Select the data that is visualized
-sv_val=60
+s_val=60
 tv_val=1
 pos = ['left', 'right', 'both', 'separate']
 legend_val = pos
@@ -141,8 +141,8 @@ gl_max = 336
 repetitions_value = 10
 
 # Read data
-df_errors = pd.read_csv(os.path.join(path_results, "TestGFparameters_" + str(pos) + '_sv' + str(sv_val) + 'd_tv' + str(tv_val) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_errors.csv"), index_col=0)
-df_sterr = pd.read_csv(os.path.join(path_results, "TestGFparameters_" + str(pos) + '_sv' + str(sv_val) + 'd_tv' + str(tv_val) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_sterr.csv"), index_col=0)
+df_errors = pd.read_csv(os.path.join(path_results, "TestGFparameters_" + str(pos) + '_s' + str(s_val) + 'd_tv' + str(tv_val) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_errors.csv"), index_col=0)
+df_sterr = pd.read_csv(os.path.join(path_results, "TestGFparameters_" + str(pos) + '_s' + str(s_val) + 'd_tv' + str(tv_val) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_sterr.csv"), index_col=0)
 
 # Make figures and axes
 fig, axes = plt.subplots(1, 2, sharey='row', gridspec_kw={'width_ratios': [4,1]}, figsize=(5,7))
@@ -153,7 +153,7 @@ if legend_val == pos:
     colormap=['peru', 'red', 'darkorange', 'gold']
 if legend_val == tv_val:
     colormap=['lawngreen', 'darkgreen', 'turquoise', 'deepskyblue', 'steelblue']
-if legend_val == sv_val:
+if legend_val == s_val:
     colormap =['black', 'gray', 'darkblue', 'dodgerblue', 'rebeccapurple', 'fuchsia', 'crimson', 'palevioletred']
 
 # Make plot for all axes
@@ -166,7 +166,7 @@ for i,col in enumerate(df_errors.columns):
 if legend_val == pos:
     fig.suptitle(station, x=0.5, y=0.93, fontsize=17)
 if station=='Puutori':
-    if legend_val==sv_val or legend_val==tv_val:
+    if legend_val==s_val or legend_val==tv_val:
         columns=2
     else:
         columns=1
@@ -208,7 +208,7 @@ plt.savefig(os.path.join(path_figures, 'Evaluation_parameters_' + str(legend_val
 #%% FIGURE 8: RESULTS EVALUATION GF ALGORITHM
 
 # Select the data that is visualized
-sv = 60
+s = 60
 tv = 1
 thr_LI = 5
 thr_minLP = 30
@@ -231,10 +231,10 @@ for station in ['Betel', 'Puutori', 'Virastotalo']:
         UHI_obs_mean.loc[:, season]=UHI_obs[number_season[number]].loc[:,station]
     
     # Prepare dataset of estimated UHI
-    UHI_filled_mean = pd.read_csv(os.path.join(path_results, "TestGFalgorithm_sv" + str(sv) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel + '_rep' + str(repetitions) + '_' + city + "_" + station + "_FILLED_mean.csv"),
+    UHI_filled_mean = pd.read_csv(os.path.join(path_results, "TestGFalgorithm_s" + str(s) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel + '_rep' + str(repetitions) + '_' + city + "_" + station + "_FILLED_mean.csv"),
                                 index_col=0)
     # UHI_filled_mean.rename(columns= {'autumn': 'autumn_filled', 'spring': 'spring_filled', 'summer': 'summer_filled', 'winter': 'winter_filled'}, inplace=True)
-    UHI_filled_sterr = pd.read_csv(os.path.join(path_results, "TestGFalgorithm_sv" + str(sv) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel + '_rep' + str(repetitions) + '_' + city + "_" + station + "_FILLED_sterr.csv"),
+    UHI_filled_sterr = pd.read_csv(os.path.join(path_results, "TestGFalgorithm_s" + str(s) + 'd_tv' + str(tv) + 'h_thrLI' + str(thr_LI) + 'h_thrminLP' + str(thr_minLP) + 'd_thrminLPs' + str(thr_minLPs) + 'd_thrbs' + str(thr_bs) + 'd_Pgap' + str(round(P_begingap,6)) + '_distr' + distrlabel + '_rep' + str(repetitions) + '_' + city + "_" + station + "_FILLED_sterr.csv"),
                                 index_col=0)
     # UHI_filled_sterr.rename(columns= {'autumn': 'autumn_filled', 'spring': 'spring_filled', 'summer': 'summer_filled', 'winter': 'winter_filled'}, inplace=True)
     

@@ -31,15 +31,15 @@ city='Turku'
 #%% SETUP OF GF
 
 # Dictionary with settings of GF
-sv=60
+s=60
 tv=1
 positioning = 'both'
 
 dictionary = {"linint": np.nan,
               "fillmodel": np.nan,
-              "debmodelReg": [sv, tv, positioning, 1, False],
-              "debmodelMeanbias": [sv, tv, positioning, False],
-              "debmodelTvar": [sv, tv, positioning]}
+              "debmodelReg": [s, tv, positioning, 1, False],
+              "debmodelMeanbias": [s, tv, positioning, False],
+              "debmodelTvar": [s, tv, positioning]}
 
 # Declare the names of the data and columns
 dataset = Turku
@@ -50,7 +50,7 @@ station = stations[5]
 ERA5 = station + '_ERA5'
 
 # Choose settings for the repetition and evaluation of the GF
-par_slicedates_value = int(sv) # number of days in which no gaps are placed in the beginning and end of dataset
+par_slicedates_value = int(s) # number of days in which no gaps are placed in the beginning and end of dataset
 error_value = 'MSE'
 gl_min = 1 # minimum gap length (for adiministration purpose only)
 gl_step = 0 # not with a regular step (for adiministration purpose only)
@@ -75,8 +75,8 @@ df_errors, df_sterr = Test_techniques_differentgaplengths(df=dataset,
 
 #%% SAVE RESULTS
 
-df_errors.to_csv(os.path.join(path_results, "TestGFtechniques_" + positioning + '_sv' + str(sv) + 'd_tv' + str(tv) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_errors.csv"), index=True)
-df_sterr.to_csv(os.path.join(path_results, "TestGFtechniques_" + positioning + '_sv' + str(sv) + 'd_tv' + str(tv) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_sterr.csv"), index=True)
+df_errors.to_csv(os.path.join(path_results, "TestGFtechniques_" + positioning + '_s' + str(s) + 'd_tv' + str(tv) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_errors.csv"), index=True)
+df_sterr.to_csv(os.path.join(path_results, "TestGFtechniques_" + positioning + '_s' + str(s) + 'd_tv' + str(tv) + "h_" + "gl" + str(gl_min) + "-" + str(gl_max) + "-" + str(gl_step) + "_" + "rep" + str(repetitions_value) + "_" + city + "_" + station + "_" + error_value + "_sterr.csv"), index=True)
 
 
 
