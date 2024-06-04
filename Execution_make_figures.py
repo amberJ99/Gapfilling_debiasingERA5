@@ -252,7 +252,7 @@ for station in ['Betel', 'Puutori', 'Virastotalo']:
 
     # Settings for plot
     ax.set_title('UHI '+ station)
-    ax.set_xlabel('Hour')
+    ax.set_xlabel('Hour (UTC)')
     ax.set_ylabel('UHI (°C)')
 
     # To get legends:
