@@ -5,9 +5,8 @@ Gapfilling_debiasingERA5
 This code supports the publication of a paper related to gap-filling of urban temperature time series, by debiasing ERA5 reanalysis data.
 
 Publication:
-	Amber Jacobs, Sara Top, Thomas Vergauwen, Steven Caluwaerts, ...
+	Amber Jacobs, Sara Top, Thomas Vergauwen, Juuso Suomi, Jukka Käyhkö and Steven Caluwaerts
 	Filling gaps in urban temperature observations by debiasing ERA5 reanalysis data
-	Urban Climate
 
 ----------------------------------------------------------------------------------------------------------------------------------
 
